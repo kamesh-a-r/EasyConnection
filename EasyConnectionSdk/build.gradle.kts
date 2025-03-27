@@ -1,8 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("maven-publish")    // Add this plugin
-    id("signing")
+    id("maven-publish") // Add this plugin
+    id("signing") // Add this if you want to sign the artifacts
+
 }
 
 android {
@@ -68,7 +69,7 @@ afterEvaluate {
 
                 groupId = "com.kamesh.easyconnectionsdk"
                 artifactId = "easyconnectionsdk"
-                version = "1.0.0"
+                version = "1.0.2"
 
                 pom {
                     name.set("EasyConnection SDK")
@@ -101,17 +102,13 @@ afterEvaluate {
 
         repositories {
             maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                name = "GithubPackages"
+                url = uri("https://maven.pkg.github.com/Silentou/EasyConnection")
                 credentials {
-                    username = project.findProperty("ossrhUsername") as String?
-                    password = project.findProperty("ossrhPassword") as String?
+                    username = System.getenv("GH_USERNAME")
+                    password = System.getenv("GH_TOKEN")
                 }
             }
         }
-    }
-
-    signing {
-        sign(publishing.publications)
     }
 }

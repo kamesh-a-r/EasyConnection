@@ -42,7 +42,8 @@ android {
 dependencies {
 
     // Project Modules
-    implementation(project(":EasyConnectionSdk"))
+//    implementation(project(":EasyConnectionSdk"))
+    implementation(libs.easyconnectionsdk)
 
     // Core Libraries
     implementation(libs.androidx.core.ktx)
