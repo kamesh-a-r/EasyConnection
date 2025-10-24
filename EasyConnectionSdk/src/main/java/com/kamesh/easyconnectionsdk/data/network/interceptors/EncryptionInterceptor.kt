@@ -86,19 +86,17 @@ class EncryptionInterceptor(
         // Only attempt decryption in normal mode and if response is encrypted
         if (!testMode && response.header("Content-Encryption") == "AES") {
             val responseBody = response.body
-            if (responseBody != null) {
-                val contentType = responseBody.contentType()
-                val encryptedContent = responseBody.string()
-                val iv = decryptIv(response.header("Encryption-IV") ?: "")
-                val decryptedContent = decrypt(encryptedContent, iv)
+            val contentType = responseBody.contentType()
+            val encryptedContent = responseBody.string()
+            val iv = decryptIv(response.header("Encryption-IV") ?: "")
+            val decryptedContent = decrypt(encryptedContent, iv)
 
-                // Create a new response with the decrypted body
-                return response.newBuilder()
-                    .body(decryptedContent.toResponseBody(contentType))
-                    .removeHeader("Content-Encryption")
-                    .removeHeader("Encryption-IV")
-                    .build()
-            }
+            // Create a new response with the decrypted body
+            return response.newBuilder()
+                .body(decryptedContent.toResponseBody(contentType))
+                .removeHeader("Content-Encryption")
+                .removeHeader("Encryption-IV")
+                .build()
         }
 
         return response

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Easy Connection</string>
+    <string name="error">Error: %1$s - %2$s</string>
+    <string name="exception">Exception: %1$s</string>
+    <string name="testing_post_request">Testing POST request…</string>
+    <string name="testing_get_request">Testing GET request…</string>
 </resources>

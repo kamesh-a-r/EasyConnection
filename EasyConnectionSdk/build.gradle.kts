@@ -8,11 +8,10 @@ plugins {
 
 android {
     namespace = "com.kamesh.easyconnectionsdk"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -57,6 +56,10 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
+    testImplementation(libs.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
@@ -69,11 +72,11 @@ afterEvaluate {
 
                 groupId = "com.kamesh.easyconnectionsdk"
                 artifactId = "easyconnectionsdk"
-                version = "1.0.2"
+                version = "1.0.3"
 
                 pom {
                     name.set("EasyConnection SDK")
-                    description.set("A simple SDK for managing connections in Android apps.")
+                    description.set("A simple SDK for managing connections and WebView integration in Android apps.")
                     url.set("https://github.com/Silentou/EasyConnection")
 
                     licenses {

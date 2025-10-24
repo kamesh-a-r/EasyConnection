@@ -25,6 +25,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".WebViewDemoActivity"
+            android:exported="false"
+            android:label="WebView Demo"
+            android:theme="@style/Theme.EasyConnection" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.kamesh.easyconnection
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         val testEncryptionButton = findViewById<Button>(R.id.encryptionButton)
         val testRetryButton = findViewById<Button>(R.id.retryButton)
         val testCacheButton = findViewById<Button>(R.id.cacheButton)
+        val webViewDemoButton = findViewById<Button>(R.id.webViewDemoButton)
 
         // Initialize the SDK with basic configuration
         initializeSDK()
@@ -109,6 +111,11 @@ class MainActivity : AppCompatActivity() {
         testEncryptionButton.setOnClickListener { testEncryption() }
         testRetryButton.setOnClickListener { testRetry() }
         testCacheButton.setOnClickListener { testCache() }
+        
+        // WebView demo button
+        webViewDemoButton.setOnClickListener { 
+            startActivity(Intent(this, WebViewDemoActivity::class.java))
+        }
 
     }
 
@@ -131,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     // Basic CRUD test methods
     private fun testGetRequest() {
-        resultTextView.text = "Testing GET request..."
+        resultTextView.text = getString(R.string.testing_get_request)
 
         lifecycleScope.launch {
             try {
@@ -150,17 +157,18 @@ class MainActivity : AppCompatActivity() {
 
                     resultTextView.text = result.toString()
                 } else {
-                    resultTextView.text = "Error: ${response.code()} - ${response.message()}"
+                    resultTextView.text =
+                        getString(R.string.error, response.code().toString(), response.message())
                 }
             } catch (e: Exception) {
-                resultTextView.text = "Exception: ${e.message}"
+                resultTextView.text = getString(R.string.exception, e.message)
                 e.printStackTrace()
             }
         }
     }
 
     private fun testPostRequest() {
-        resultTextView.text = "Testing POST request..."
+        resultTextView.text = getString(R.string.testing_post_request)
 
         lifecycleScope.launch {
             try {
@@ -185,7 +193,7 @@ class MainActivity : AppCompatActivity() {
 
                     resultTextView.text = result.toString()
                 } else {
-                    resultTextView.text = "Error: ${response.code()} - ${response.message()}"
+                    resultTextView.text = getString(R.string.error, response.code().toString(), response.message())
                 }
             } catch (e: Exception) {
                 resultTextView.text = "Exception: ${e.message}"

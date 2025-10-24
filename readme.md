@@ -7,6 +7,7 @@ A lightweight, feature-rich Android networking library that simplifies API integ
 
 ## Features
 
+### Networking
 - 🔒 **Request/Response Encryption** - Optional AES-256 encryption for sensitive data
 - 🔄 **Auto-Retry Logic** - Configurable retry mechanism for failed network requests
 - 💾 **Response Caching** - Built-in cache support with improved control (maxAge, maxStale)
@@ -15,6 +16,16 @@ A lightweight, feature-rich Android networking library that simplifies API integ
 - 🔑 **Authentication Support** - Built-in header and token-based authentication
 - 📋 **Flexible Headers** - Easily add custom headers to requests
 - 🔍 **Detailed Logging** - Optional request/response logging for debugging
+
+### WebView Integration (NEW in v1.0.3)
+- 🌐 **EasyWebView Component** - Custom WebView with built-in SDK integration
+- 🔗 **JavaScript Interface** - Seamless bidirectional communication between Android and web
+- 📱 **Local HTML Support** - Load HTML files from assets with parameters
+- 🎯 **Auto-Configuration** - Automatically syncs base URL and headers from SDK
+- 📦 **Parameter Passing** - Type-safe parameter passing to JavaScript
+- 🎨 **Sample Templates** - Ready-to-use HTML templates included
+
+### General
 - 💻 **Modern Architecture** - Built with Kotlin, Coroutines, and Retrofit
 - 🔨 **Fluent Builder API** - Easy, readable configuration using builder pattern
 
@@ -26,7 +37,7 @@ Add the dependency to your app's `build.gradle.kts` file:
 
 ```kotlin
 dependencies {
-    implementation("com.kamesh.easyconnectionsdk:easyconnectionsdk:1.0.0")
+    implementation("com.kamesh.easyconnectionsdk:easyconnectionsdk:1.0.3")
 }
 ```
 
@@ -34,7 +45,7 @@ Or if using the older Groovy syntax:
 
 ```groovy
 dependencies {
-    implementation 'com.kamesh.easyconnectionsdk:easyconnectionsdk:1.0.0'
+    implementation 'com.kamesh.easyconnectionsdk:easyconnectionsdk:1.0.3'
 }
 ```
 
@@ -321,6 +332,73 @@ when (exception) {
     }
 }
 ```
+
+## WebView Integration
+
+The SDK now includes a powerful WebView component for hybrid app development. Perfect for loading local HTML files and enabling communication between your Android app and web content.
+
+### Quick WebView Setup
+
+```kotlin
+// 1. Add to layout
+<com.kamesh.easyconnectionsdk.presentation.webview.EasyWebView
+    android:id="@+id/webView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+// 2. Setup in Activity
+val webView: EasyWebView = findViewById(R.id.webView)
+
+EasyWebViewHelper.setupWebView(
+    webView = webView,
+    additionalParams = mapOf(
+        "userId" to "123",
+        "userName" to "John Doe"
+    ),
+    onMessageReceived = { message, data ->
+        Log.d("WebView", "Received: $message")
+    }
+)
+
+// 3. Load HTML
+webView.loadAssetFile("index.html")
+// Or use sample page
+EasyWebViewHelper.loadSamplePage(webView)
+```
+
+### JavaScript API
+
+Your HTML files can access Android data through the `EasyConnection` JavaScript interface:
+
+```javascript
+// Get base URL from SDK
+const baseUrl = EasyConnection.getBaseUrl();
+
+// Get parameters
+const params = JSON.parse(EasyConnection.getParameters());
+console.log(params.userId); // "123"
+
+// Send message to Android
+EasyConnection.sendMessage('button_click', JSON.stringify({ action: 'test' }));
+
+// Log to Android logcat
+EasyConnection.log('Debug message');
+```
+
+### Send Data to JavaScript
+
+```kotlin
+// From Android to JavaScript
+val data = mapOf("message" to "Hello from Android")
+webView.sendToJavaScript("receiveFromAndroid", data)
+
+// Execute JavaScript
+webView.executeJavaScript("updateUI()")
+```
+
+For comprehensive WebView documentation, see:
+- [WebView Quick Start Guide](WEBVIEW_QUICK_START.md)
+- [WebView Full Documentation](WEBVIEW_README.md)
 
 ## Requirements
 
