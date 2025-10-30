@@ -19,8 +19,15 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = URI("https://github.com/Silentou/EasyConnection")
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Silentou/EasyConnection")
+            credentials {
+                username = System.getenv("GH_USERNAME")
+                password = System.getenv("GH_TOKEN")
+            }
         }
+        // Add Maven Local
+        mavenLocal()
     }
 }
 

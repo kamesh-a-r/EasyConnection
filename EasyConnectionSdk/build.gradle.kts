@@ -1,17 +1,17 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("maven-publish")    // Add this plugin
-    id("signing")
+    id("maven-publish") // Add this plugin
+    id("signing") // Add this if you want to sign the artifacts
+
 }
 
 android {
     namespace = "com.kamesh.easyconnectionsdk"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -56,6 +56,10 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockwebserver)
+    testImplementation(libs.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
@@ -68,11 +72,11 @@ afterEvaluate {
 
                 groupId = "com.kamesh.easyconnectionsdk"
                 artifactId = "easyconnectionsdk"
-                version = "1.0.0"
+                version = "1.0.3"
 
                 pom {
                     name.set("EasyConnection SDK")
-                    description.set("A simple SDK for managing connections in Android apps.")
+                    description.set("A simple SDK for managing connections and WebView integration in Android apps.")
                     url.set("https://github.com/Silentou/EasyConnection")
 
                     licenses {
@@ -101,17 +105,13 @@ afterEvaluate {
 
         repositories {
             maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                name = "GithubPackages"
+                url = uri("https://maven.pkg.github.com/Silentou/EasyConnection")
                 credentials {
-                    username = project.findProperty("ossrhUsername") as String?
-                    password = project.findProperty("ossrhPassword") as String?
+                    username = System.getenv("GH_USERNAME")
+                    password = System.getenv("GH_TOKEN")
                 }
             }
         }
-    }
-
-    signing {
-        sign(publishing.publications)
     }
 }

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyConnection WebView Sample</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2::before {
+            content: "→";
+            margin-right: 10px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .info-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .log-area {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 4px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .timestamp {
+            color: #666;
+            margin-right: 8px;
+        }
+
+        pre {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 EasyConnection WebView</h1>
+        <p class="subtitle">JavaScript Interface Communication Demo</p>
+
+        <div class="section">
+            <h2>SDK Configuration</h2>
+            <div class="info-item">
+                <div class="info-label">Base URL</div>
+                <div class="info-value" id="baseUrl">Loading...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Status</div>
+                <div class="info-value">
+                    <span class="status" id="status">Connected</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Parameters</h2>
+            <div id="parameters" class="info-value">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2>Custom Headers</h2>
+            <div id="headers" class="info-value">Loading...</div>
+        </div>
+
+        <div class="section">
+            <h2>Actions</h2>
+            <div class="button-group">
+                <button onclick="testGetParameter()">Get Parameter</button>
+                <button onclick="testSendMessage()">Send Message</button>
+                <button onclick="testGetConfig()">Get Full Config</button>
+                <button onclick="clearLogs()">Clear Logs</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Console Logs</h2>
+            <div class="log-area" id="logArea"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            logMessage('Page loaded successfully');
+            loadConfiguration();
+        });
+
+        // Load configuration from Android
+        function loadConfiguration() {
+            try {
+                // Get base URL
+                if (typeof EasyConnection !== 'undefined') {
+                    const baseUrl = EasyConnection.getBaseUrl();
+                    document.getElementById('baseUrl').textContent = baseUrl;
+                    logMessage('Base URL loaded: ' + baseUrl);
+
+                    // Get all parameters
+                    const paramsJson = EasyConnection.getParameters();
+                    const params = JSON.parse(paramsJson);
+                    document.getElementById('parameters').innerHTML = 
+                        '<pre>' + JSON.stringify(params, null, 2) + '</pre>';
+                    logMessage('Parameters loaded: ' + Object.keys(params).length + ' items');
+
+                    // Get all headers
+                    const headersJson = EasyConnection.getHeaders();
+                    const headers = JSON.parse(headersJson);
+                    document.getElementById('headers').innerHTML = 
+                        '<pre>' + JSON.stringify(headers, null, 2) + '</pre>';
+                    logMessage('Headers loaded: ' + Object.keys(headers).length + ' items');
+
+                    document.getElementById('status').textContent = 'Connected';
+                } else {
+                    throw new Error('EasyConnection interface not found');
+                }
+            } catch (error) {
+                logMessage('ERROR: ' + error.message, true);
+                document.getElementById('status').textContent = 'Error';
+                document.getElementById('status').style.background = '#ef4444';
+            }
+        }
+
+        // Test getting a specific parameter
+        function testGetParameter() {
+            try {
+                const paramsJson = EasyConnection.getParameters();
+                const params = JSON.parse(paramsJson);
+                const firstKey = Object.keys(params)[0];
+                
+                if (firstKey) {
+                    const value = EasyConnection.getParameter(firstKey);
+                    logMessage('Parameter "' + firstKey + '": ' + value);
+                    alert('Parameter "' + firstKey + '": ' + value);
+                } else {
+                    logMessage('No parameters available');
+                    alert('No parameters available');
+                }
+            } catch (error) {
+                logMessage('ERROR: ' + error.message, true);
+            }
+        }
+
+        // Test sending a message to Android
+        function testSendMessage() {
+            try {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    message: 'Hello from WebView!',
+                    source: 'JavaScript'
+                };
+                
+                EasyConnection.sendMessage('test_message', JSON.stringify(data));
+                logMessage('Message sent to Android: ' + JSON.stringify(data));
+                alert('Message sent to Android!');
+            } catch (error) {
+                logMessage('ERROR: ' + error.message, true);
+            }
+        }
+
+        // Get full configuration
+        function testGetConfig() {
+            try {
+                const configJson = EasyConnection.getConfig();
+                const config = JSON.parse(configJson);
+                logMessage('Full config: ' + JSON.stringify(config));
+                
+                // Create a formatted display
+                const display = 
+                    '<div class="info-item">' +
+                    '<pre>' + JSON.stringify(config, null, 2) + '</pre>' +
+                    '</div>';
+                
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = '<h3>Full Configuration</h3>' + display;
+                tempDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 1000; max-width: 80%; max-height: 80%; overflow: auto;';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'Close';
+                closeBtn.onclick = function() { document.body.removeChild(tempDiv); };
+                tempDiv.appendChild(closeBtn);
+                
+                document.body.appendChild(tempDiv);
+            } catch (error) {
+                logMessage('ERROR: ' + error.message, true);
+            }
+        }
+
+        // Log message to console area
+        function logMessage(message, isError = false) {
+            const logArea = document.getElementById('logArea');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const color = isError ? '#ff4444' : '#00ff00';
+            
+            entry.innerHTML = 
+                '<span class="timestamp">[' + timestamp + ']</span>' +
+                '<span style="color: ' + color + '">' + message + '</span>';
+            
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+
+            // Also log to Android
+            if (typeof EasyConnection !== 'undefined') {
+                EasyConnection.log(message);
+            }
+        }
+
+        // Clear logs
+        function clearLogs() {
+            document.getElementById('logArea').innerHTML = '';
+            logMessage('Logs cleared');
+        }
+
+        // Function to receive data from Android
+        function receiveFromAndroid(data) {
+            logMessage('Received from Android: ' + JSON.stringify(data));
+            // Handle the data as needed
+        }
+
+        // Example API call function (to be used with EasyConnection SDK)
+        async function makeApiCall(endpoint) {
+            try {
+                const baseUrl = EasyConnection.getBaseUrl();
+                const response = await fetch(baseUrl + endpoint);
+                const data = await response.json();
+                logMessage('API Response: ' + JSON.stringify(data));
+                return data;
+            } catch (error) {
+                logMessage('API Error: ' + error.message, true);
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>
